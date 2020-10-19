@@ -1,0 +1,22 @@
+{
+  "name": "revocations",
+  "description": "Revocation Specification",
+  "version": "0.0.1",
+  "homepage": "https://credentials.workday.com/",
+  "license": "Apache 2",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/workdaycredentials/specifications"
+  },
+  "dependencies": {
+    "spec-up": "0.9.82"
+  },
+  "devDependencies": {
+    "ajv": "^6.12.2",
+    "mocha": "^8.0.1"
+  },
+  "scripts": {
+    "edit": "node -e \"require('spec-up')()\"",
+    "test": "mocha 'test/**/*.js'"
+  }
+}

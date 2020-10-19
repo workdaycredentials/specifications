@@ -1,0 +1,16 @@
+{
+  "specs": [
+    {
+      "title": "Revocation Specification",
+      "spec_directory": "./spec",
+      "output_path": "./",
+      "logo": "https://avatars1.githubusercontent.com/u/64261652?s=200&v=4",
+      "logo_link": "https://credentials.workday.com/",
+      "source": {
+        "host": "github",
+        "account": "workdaycredentials",
+        "repo": "specifications"
+      }
+    }
+  ]
+}
