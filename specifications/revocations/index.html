@@ -1,0 +1,515 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+            <title>Revocation Specification</title>
+            <link href="./spec-up/compiled/head.css" rel="stylesheet"/>
+                <script src="./spec-up/compiled/head.js"></script>
+          </head>
+          <body features="source logo">
+            
+            <svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="github" viewBox="0 0 20 20">
+    <path d="M10 0.247c-5.522 0-10 4.477-10 10 0 4.418 2.865 8.167 6.839 9.489 0.5 0.093 0.683-0.217 0.683-0.481 0-0.238-0.009-1.026-0.014-1.862-2.782 0.605-3.369-1.18-3.369-1.18-0.455-1.156-1.11-1.463-1.11-1.463-0.907-0.621 0.069-0.608 0.069-0.608 1.004 0.071 1.533 1.031 1.533 1.031 0.892 1.529 2.339 1.087 2.91 0.831 0.090-0.646 0.349-1.087 0.635-1.337-2.221-0.253-4.556-1.11-4.556-4.942 0-1.092 0.391-1.984 1.030-2.684-0.104-0.252-0.446-1.269 0.097-2.646 0 0 0.84-0.269 2.751 1.025 0.798-0.222 1.653-0.333 2.503-0.337 0.85 0.004 1.706 0.115 2.505 0.337 1.909-1.294 2.747-1.025 2.747-1.025 0.544 1.378 0.202 2.395 0.098 2.646 0.641 0.7 1.029 1.592 1.029 2.684 0 3.841-2.339 4.687-4.566 4.934 0.359 0.31 0.678 0.919 0.678 1.852 0 1.338-0.012 2.415-0.012 2.744 0 0.266 0.18 0.578 0.687 0.48 3.971-1.324 6.833-5.071 6.833-9.488 0-5.523-4.477-10-10-10z"></path>
+  </symbol>
+  <symbol id="nested_list" viewBox="0 0 37 32">
+    <path d="M0 2.286c0-1.262 1.023-2.286 2.286-2.286s2.286 1.023 2.286 2.286c0 1.262-1.023 2.286-2.286 2.286s-2.286-1.023-2.286-2.286zM9.143 0h27.429v4.571h-27.429zM9.143 11.429c0-1.262 1.023-2.286 2.286-2.286s2.286 1.023 2.286 2.286c0 1.262-1.023 2.286-2.286 2.286s-2.286-1.023-2.286-2.286zM18.286 9.143h18.286v4.571h-18.286zM9.143 29.714c0-1.262 1.023-2.286 2.286-2.286s2.286 1.023 2.286 2.286c0 1.262-1.023 2.286-2.286 2.286s-2.286-1.023-2.286-2.286zM18.286 27.429h18.286v4.571h-18.286zM18.286 20.571c0-1.262 1.023-2.286 2.286-2.286s2.286 1.023 2.286 2.286c0 1.262-1.023 2.286-2.286 2.286s-2.286-1.023-2.286-2.286zM27.429 18.286h9.143v4.571h-9.143z"></path>
+  </symbol>
+</svg>
+
+            <main>
+
+              <header id="header" class="panel-header">
+                <span id="toc_toggle" panel-toggle="toc">
+                  <svg icon><use xlink:href="#nested_list"></use></svg>
+                </span>
+                <a id="logo" href="https://credentials.workday.com/">
+                  <img src="https://avatars1.githubusercontent.com/u/64261652?s=200&v=4" />
+                </a>
+                <span issue-count animate panel-toggle="repo_issues">
+                  <svg icon><use xlink:href="#github"></use></svg>
+                </span>
+              </header>
+
+              <article id="content">
+                <h1 id="verifiable-credential-revocations"><a class="toc-anchor" href="#verifiable-credential-revocations">§</a> Verifiable Credential Revocations</h1>
+<p><strong>Specification Status:</strong> <strong><strong>Draft</strong></strong></p>
+<p><strong>Status Date</strong>: September 24, 2020</p>
+<p><strong>Last Revised</strong>: October 19, 2020</p>
+<p><strong>Latest Draft:</strong>
+<a href="https://github.com/workdaycredentials/specifications/revocations">workdaycredentials/specifications/revocations</a></p>
+<!-- -->
+<dl>
+<dt><strong>Editors:</strong></dt>
+<dd><a href="mailto:rory.martin@workday.com">Rory Martin</a> (Workday)</dd>
+<dd><a href="mailto:gabe.cohen@workday.com">Gabe Cohen</a> (Workday)</dd>
+<dd><a href="mailto:bjorn.hamel@workday.com">Bjorn Hamel</a> (Workday)</dd>
+<dd><a href="mailto:lio.lunesu@workday.com">Lionello Lunesu</a> (Workday)</dd>
+<dt><strong>Participate:</strong></dt>
+<dd><a href="https://github.com/workdaycredentials/specifications">GitHub repo</a></dd>
+<dd><a href="https://github.com/workdaycredentials/specifications/issues">File a bug</a></dd>
+<dd><a href="https://github.com/workdaycredentials/specifications/commits/master">Commit history</a></dd>
+</dl>
+<hr>
+<h2 id="abstract"><a class="toc-anchor" href="#abstract">§</a> Abstract</h2>
+<p>The <a href="https://w3c.github.io/vc-data-model">Verifiable Credentials Specification</a> makes approximately twenty references to <em>revocations</em> without defining much about how they should look or work. The specification, however, does give a few guidelines for revocations:</p>
+<ul>
+<li>Revocation by the issuer should not reveal any identifying information about the subject, the holder, the specific verifiable credential, or the verifier.</li>
+<li>Issuers can disclose the revocation reason.</li>
+<li>Issuers revoking verifiable credentials should distinguish between revocation for cryptographic integrity (for example, the signing key is compromised) versus revocation for a status change (for example, the driver’s license is suspended).</li>
+<li>A verifier verifies the authenticity of the presented verifiable presentation and verifiable credentials. This should include checking the credential status for revocation of the verifiable credentials.</li>
+<li>Issuers are urged to not use mechanisms, such as credential revocation lists that are unique per credential, during the verification process that could lead to privacy violations.</li>
+<li>If the credential supports revocation, use a globally-distributed service.</li>
+<li>Designing revocation APIs that do not depend on submitting the ID of the credential. For example, use a revocation list instead of a query.</li>
+</ul>
+<p>These guidelines have led us to the following proposal for a standard data format to create Verifiable Credential Revocations. This specification also outlines considerations and concerns when evaluating different hosting models.</p>
+<h2 id="status-of-this-document"><a class="toc-anchor" href="#status-of-this-document">§</a> Status of This Document</h2>
+<p>This document is in <strong><strong>DRAFT</strong></strong> form. In its current state, it is a representation of the Workday Credential Platform with limited input from others in the community.</p>
+<h2 id="terminology"><a class="toc-anchor" href="#terminology">§</a> Terminology</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Term</th>
+<th style="text-align:left">Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="https://w3c.github.io/did-core/">Decentralized Identifier (DID)</a></td>
+<td style="text-align:left">A unique ID string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in a target system (i.e. blockchain, distributed ledger).</td>
+</tr>
+<tr>
+<td style="text-align:left">Credential</td>
+<td style="text-align:left">A <a href="https://w3c.github.io/vc-data-model/">W3C Verifiable Credential</a> — cryptographically secure, privacy respecting, and machine-verifiable data</td>
+</tr>
+<tr>
+<td style="text-align:left">Holder</td>
+<td style="text-align:left">The entity that has in their possession and control a Verifiable Credential</td>
+</tr>
+<tr>
+<td style="text-align:left">Issuer</td>
+<td style="text-align:left">The entity that issues Verifiable Credentials and has the ability to create Revocations</td>
+</tr>
+<tr>
+<td style="text-align:left">Verifier</td>
+<td style="text-align:left">The entity that requests data and checks a Credential’s status</td>
+</tr>
+</tbody>
+</table>
+<h2 id="revocations"><a class="toc-anchor" href="#revocations">§</a> Revocations</h2>
+<p>Revocations are documents that indicate a <em>revoked</em> status of Verifiable Credentials. Revocations are a mechanism by which an issuer can update the <em>status</em> of a Credential after issuance. Revoking a Credential results in the claims no longer being accepted as valid, regardless of the validity of any digital signatures.</p>
+<p>Following the guidelines laid out in the Verifiable Credentials Data Model we have derived the following Revocation Data Model:</p>
+<h3 id="data-model"><a class="toc-anchor" href="#data-model">§</a> Data Model</h3>
+<p>The Revocation data model is divided into two parts: encrypted — the revocation itself, and unencrypted — the revocation metadata. We always encrypt the <code>revocation</code> object to satisfy some of the privacy constraints and concerns outlined in the VC Spec. The only requirement of data to be unencrypted is the Revocation ID because we generate it using a one-way hash function. A key derivation function (KDF) is used to encrypt the Revocation, with the Credential ID being the input to the KDF. The logic behind this is that Credential IDs are unknown until the moment a Credential is shared. This is secure because once shared, the Verifier may wish to check the Credential’s status — and only once a Credential is shared will a Verifier have the requisite information to lookup and decrypt a Revocation.</p>
+<h4 id="type"><a class="toc-anchor" href="#type">§</a> Type</h4>
+<p>To tie in to the <a href="https://w3c.github.io/vc-data-model/#status">VC Data Model’s credentialStatus</a> property this scheme is referred to as <code>RevocationService2020</code>.</p>
+<h4 id="unencrypted-data"><a class="toc-anchor" href="#unencrypted-data">§</a> Unencrypted Data</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Field</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>id</code></td>
+<td style="text-align:left">The Revocation Identifier. A <a href="https://tools.ietf.org/html/rfc4634#section-4.1">SHA-256</a> hash of the Issuer DID and Credential ID. This effectively creates a namespace for the issuer, who has control over the Credential ID generation. This ensures that there cannot be a conflict even if two issuers use the same Credential ID. It is not recommended for an Issuer  to reuse a Credential ID, as all Credentials would be revoked by a single revocation. An alternate ID scheme could be (Issuer ID + “/” + Base58(SHA-256(Credential ID)), which isn’t as privacy preserving for the issuer, but is verifiable by public nodes, which can see that the ID and proof are generated by the same identifier. An additional scheme allows the Identifier to be random, reducing the chance of collision and preventing attacks which attempt to calculate and claim the Identifier.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>type</code></td>
+<td style="text-align:left">A URI property providing semantic meaning for the document (e.g. a link to this specification).</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>version</code></td>
+<td style="text-align:left">A <a href="https://semver.org/">Semantic Version</a> for the data model to support backwards compatibility.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>revokeRevealValue</code></td>
+<td style="text-align:left">An opaque, cryptographically random value, that is the pre-image of the revocation commitment in the Credential being revoked.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>proof</code></td>
+<td style="text-align:left">A <a href="https://w3c-ccg.github.io/ld-proofs/">Linked Data Proof</a> providing authenticity from the Issuer of the Credential of the Revocation.</td>
+</tr>
+</tbody>
+</table>
+<div id="risk-of-proof" class="notice note"><a class="notice-link" href="#risk-of-proof">NOTE</a><p>A proof may either be unencrypted or encrypted. If unencrypted it is recommended that the proof is not stored publicly, but rather acts as an argument to the logic that would allow a revocation to be written to a data store.</p>
+<p>If stored on a ledger, depending on its consensus mechanism, it may be possible to omit the <code>proof</code> field from the value recorded on ledger while still including it as a transient argument of the write request in order to determine the validity of payload.</p>
+<p>We recommend that the proof should never be publicly visible, since this reveals data about the issuer of the revocation.</p>
+</div>
+<h4 id="encrypted-data"><a class="toc-anchor" href="#encrypted-data">§</a> Encrypted Data</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Field</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>issuerId</code></td>
+<td style="text-align:left">The Identifier of the Issuer of the Credential being revoked.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>credentialId</code></td>
+<td style="text-align:left">The <a href="https://tools.ietf.org/html/rfc4122">UUID-4</a> Identifier of the Credential being revoked. This is <strong>essential</strong> — any predictible Credential ID scheme would be at risk of de-anonymization.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>revoked</code></td>
+<td style="text-align:left">An <a href="https://tools.ietf.org/html/rfc3339">RFC-3339</a> compliant date-time value indicating when the Credential was revoked.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>reasonCode</code></td>
+<td style="text-align:left">An integer enumeration value giving information on why the Credential was revoked (e.g. “cryptographic key compromised”). This could tie in to a standard such as a <a href="https://tools.ietf.org/html/rfc5280#section-5.3.1e">CRLReason</a>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-considerations"><a class="toc-anchor" href="#implementation-considerations">§</a> Implementation Considerations</h3>
+<p>As mentioned above, the crux of the security is that both the key and the payload are obfuscated (hash and encryption, respectively) by a randomly generated value, which is only known to those that have held the credential. Having such a value as a key greatly reduces the risks of brute force attacks, which could attempt to expose revocation data by repeatedly querrying until a hit is found. Additionally, because the data <strong>should be</strong> stored on a public service, the data itself needs to be obfuscated. As mentioned above, the entire revocation, with metadata, is to be encrypted using a password-based encryption scheme such as <a href="https://www.ietf.org/rfc/rfc2898.txt">PBKDF2</a> with a sufficient key length, and number of salt bits and iterations.</p>
+<p>Verifiers can use the <code>revokeRevealValue</code> to ensure the revocation matches the revocation commitment in the Credential being revoked. When obtaining revocations from a public ledger, this ensures the revocation was done by the Issuer of the Credential, since only the Issuer would have access to the pre-image of the revocation commitment. To this end, we add a <code>revoke_commitment</code> to the Credential Data Model <code>credentialStatus</code> object.</p>
+<h3 id="examples"><a class="toc-anchor" href="#examples">§</a> Examples</h3>
+<p>In the examples provided below we show both unencrypted and encrypted variations of our implementation. Encrypted examples set the <code>revocation</code> property to a <a href="https://tools.ietf.org/id/draft-msporny-base58-01.html">Base58</a> encoded version of the password-encrypted byte array revocation.</p>
+<tab-panels selected-index="0">
+<nav>
+  <button type="button">Core Revocation</button>
+  <button type="button">Revocation with Metadata Unencrypted Proof</button>
+  <button type="button">Revocation with Metadata Unencrypted Proof (Encrypted)</button>
+  <button type="button">Revocation with Metadata Encrypted Proof</button>
+  <button type="button">Revocation with Metadata Encrypted Proof (Encrypted)</button>
+</nav>
+<section>
+<div id="core-revocation" class="notice example"><a class="notice-link" href="#core-revocation">EXAMPLE</a><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"7cMJ7xyvWYkHGSKpNtY2ojP6zeM83KzUhkUx3Czxs88Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"credentialId"</span><span class="token operator">:</span> <span class="token string">"ebf07b21-0891-458a-b642-19e1b16a001d"</span><span class="token punctuation">,</span>
+  <span class="token property">"issuerId"</span><span class="token operator">:</span> <span class="token string">"did:example:RA61wuqiu6jfc4EdAPcGJF"</span><span class="token punctuation">,</span>
+  <span class="token property">"revoked"</span><span class="token operator">:</span> <span class="token string">"2020-09-16T23:13:47Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"reasonCode"</span><span class="token operator">:</span> <span class="token number">1</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</div>
+</section>
+<section>
+<div id="revocation-with-metadata-unencrypted-proof" class="notice example"><a class="notice-link" href="#revocation-with-metadata-unencrypted-proof">EXAMPLE</a><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"FXKXbA8MCbMjzvotXRZmAXmKd1Um4DEmize15JWz2Pe9"</span><span class="token punctuation">,</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"https://link-to-revocation-spec.com/spec.json"</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"revokeRevealValue"</span><span class="token operator">:</span> <span class="token string">"+8jt3fqyfuQyPZh8LaiwTIh3+XFgFpfj"</span><span class="token punctuation">,</span>
+  <span class="token property">"revocation"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"FXKXbA8MCbMjzvotXRZmAXmKd1Um4DEmize15JWz2Pe9"</span><span class="token punctuation">,</span>
+    <span class="token property">"credentialId"</span><span class="token operator">:</span> <span class="token string">"2ad5c839-5fe9-42e7-98f7-ab731d28a2e1"</span><span class="token punctuation">,</span>
+    <span class="token property">"issuerId"</span><span class="token operator">:</span> <span class="token string">"did:example:SfqBc7sKNw7J5YnwPUmjkg"</span><span class="token punctuation">,</span>
+    <span class="token property">"revoked"</span><span class="token operator">:</span> <span class="token string">"2020-10-13T21:06:56Z"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"proof"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"created"</span><span class="token operator">:</span> <span class="token string">"2020-10-13T21:06:56Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"proofPurpose"</span><span class="token operator">:</span> <span class="token string">"assertionMethod"</span><span class="token punctuation">,</span>
+    <span class="token property">"verificationMethod"</span><span class="token operator">:</span> <span class="token string">"did:example:SfqBc7sKNw7J5YnwPUmjkg#key-1"</span><span class="token punctuation">,</span>
+    <span class="token property">"nonce"</span><span class="token operator">:</span> <span class="token string">"de14ff97-0b2a-46a3-9c9e-39d1f27d8caf"</span><span class="token punctuation">,</span>
+    <span class="token property">"signatureValue"</span><span class="token operator">:</span> <span class="token string">"3eyS68WwX7TtwZe41V5rxfB2ZkCBpQ6vH77ZUJCUn3Nd5L5xymHLkr1iv12xuugMKnYKXMiFQqcNcKyNx475DVks"</span><span class="token punctuation">,</span>
+    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"JcsEd25519Signature2020"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</div>
+</section>
+<section>
+<div id="revocation-with-metadata-unencrypted-proof-(encrypted)" class="notice example"><a class="notice-link" href="#revocation-with-metadata-unencrypted-proof-(encrypted)">EXAMPLE</a><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"7cMJ7xyvWYkHGSKpNtY2ojP6zeM83KzUhkUx3Czxs88Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"https://link-to-revocation-spec.com/spec.json"</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"revokeRevealValue"</span><span class="token operator">:</span> <span class="token string">"+8jt3fqyfuQyPZh8LaiwTIh3+XFgFpfj"</span><span class="token punctuation">,</span>
+  <span class="token property">"revocation"</span><span class="token operator">:</span> <span class="token string">"6RJqc5NPPac1PRVJwVE9xJJbKUDbZH3c4rNphvig6SUbHxDZsb9k25H8WezaQKikLfLyjCiekHRFK86WbJpout6v3KJMYq1iXS6cut4Qb4xd8QPUJCHFANibqeZmmH11hnexaUrLX7Z1KfseAUBbj8z8FbpNhQzqB9xMdu1RgUzD523xNaN4mxaWJofz1qdZQ8Vc38faqo5sUaVQHaM3itQ1UGaQVaacobj5Q2DJXKrnwSw2nJsXcTaXwYywFCE7s6UzMa9uyJ3BdZAN17Uaj77dfBGw1hMAN21uEPPRrMuUjijw3h3XKqA27pYvz3Wka1eA7vdh23RrVevoM3bo9Yhpe7soyTfzmRVkGKJDVEvi9Bn5TaaUt3u65Cjq685pMVopCD8NXNUcs2noRiZnfRaSA8cbaMrMnvdNXvc7fuZp9VK55hNqYNugCgCe3SA6HqoQJpuQrceCkBLLR8agwDTgXpmhNwu5pTJwDkQuuyrHyUbtDd8ycAycvZ4zVrmybGR8vTTK7NX2ZW8ySR7FGLEJC1YVSc1CXG2ZmZxV2mVC3Qku7LZ8dzukXZZjHFfyjKr38fdNDLmpDAjprr6StUyqas5AjcFPuJNpAdB8HL1hZ4fR7xRjjjyKHYas2J46w6sFM66Nb66hS77iF2NJkvbkFACuxGnTN4vmkLkiTQ37uGPiBXiLYpWK82w7JVsLsusBN3KcbNhyUph5ccHqn7hCcYxz7CRWowX13HbEvnAoVsudBMdLLu3FVdVpXWZ6WCLAkKA3b3ybabPi7EKMBCZTWcQ3TpsYYcqKHKbNc8xJXA6cSRw88Zw5HoUEEonB3oSdKqHTZvKhzFotZC7vmx3GYBa1fnnhyFDRq4CZzm9ezcGjSdyqrcoxcNjzWph9tFJxvS6Q6Y55JHaJfphuFBUDhDsPVrASD7ChKw2kaPAspdEa9TKk8EzMMZjFfQVKFjEdd3PHjNmG43edS1AmPK4uRdBF8c3pddVKKk7Do1MAApLBTDNCND6aexM4GjcY9ojAC9VEtev2vXDBuF3G7TH5zwp1Nsk22R2UqcDRqTDPQPNpVHuVDf46Gd"</span><span class="token punctuation">,</span>
+  <span class="token property">"proof"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"created"</span><span class="token operator">:</span> <span class="token string">"2020-09-16T23:13:47Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"verificationMethod"</span><span class="token operator">:</span> <span class="token string">"did:example:RA61wuqiu6jfc4EdAPcGJF#key-1"</span><span class="token punctuation">,</span>
+    <span class="token property">"nonce"</span><span class="token operator">:</span> <span class="token string">"0365b52e-8ec5-4b0a-9b03-839282d609b8"</span><span class="token punctuation">,</span>
+    <span class="token property">"proofPurpose"</span><span class="token operator">:</span> <span class="token string">"assertionMethod"</span><span class="token punctuation">,</span>
+    <span class="token property">"signatureValue"</span><span class="token operator">:</span> <span class="token string">"4k9P8h2fwcZKwvNzMyiaLCd429iGTiQTAPowHm3QoftscgQfbaZ2mAMVu6QUAQphRQMeWYqmk9v4up9ghjnG5HGz"</span><span class="token punctuation">,</span>
+    <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"JcsEd25519Signature2020"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</div>
+</section>
+<section>
+<div id="revocation-with-metadata-encrypted-proof" class="notice example"><a class="notice-link" href="#revocation-with-metadata-encrypted-proof">EXAMPLE</a><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"7cMJ7xyvWYkHGSKpNtY2ojP6zeM83KzUhkUx3Czxs88Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"https://link-to-revocation-spec.com/spec.json"</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"revokeRevealValue"</span><span class="token operator">:</span> <span class="token string">"+8jt3fqyfuQyPZh8LaiwTIh3+XFgFpfj"</span><span class="token punctuation">,</span>
+  <span class="token property">"revocation"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"7cMJ7xyvWYkHGSKpNtY2ojP6zeM83KzUhkUx3Czxs88Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"credentialId"</span><span class="token operator">:</span> <span class="token string">"ebf07b21-0891-458a-b642-19e1b16a001d"</span><span class="token punctuation">,</span>
+    <span class="token property">"issuerId"</span><span class="token operator">:</span> <span class="token string">"did:example:RA61wuqiu6jfc4EdAPcGJF"</span><span class="token punctuation">,</span>
+    <span class="token property">"revoked"</span><span class="token operator">:</span> <span class="token string">"2020-09-16T23:13:47Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"reasonCode"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+    <span class="token property">"proof"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"created"</span><span class="token operator">:</span> <span class="token string">"2020-09-16T23:13:47Z"</span><span class="token punctuation">,</span>
+      <span class="token property">"verificationMethod"</span><span class="token operator">:</span> <span class="token string">"did:example:RA61wuqiu6jfc4EdAPcGJF#key-1"</span><span class="token punctuation">,</span>
+      <span class="token property">"nonce"</span><span class="token operator">:</span> <span class="token string">"0365b52e-8ec5-4b0a-9b03-839282d609b8"</span><span class="token punctuation">,</span>
+      <span class="token property">"proofPurpose"</span><span class="token operator">:</span> <span class="token string">"assertionMethod"</span><span class="token punctuation">,</span>
+      <span class="token property">"signatureValue"</span><span class="token operator">:</span> <span class="token string">"4k9P8h2fwcZKwvNzMyiaLCd429iGTiQTAPowHm3QoftscgQfbaZ2mAMVu6QUAQphRQMeWYqmk9v4up9ghjnG5HGz"</span><span class="token punctuation">,</span>
+      <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"JcsEd25519Signature2020"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</div>
+</section>
+<section>
+<div id="revocation-with-metadata-encrypted-proof-(encrypted)" class="notice example"><a class="notice-link" href="#revocation-with-metadata-encrypted-proof-(encrypted)">EXAMPLE</a><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"7cMJ7xyvWYkHGSKpNtY2ojP6zeM83KzUhkUx3Czxs88Z"</span><span class="token punctuation">,</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"https://link-to-revocation-spec.com/spec.json"</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token string">"1.0"</span><span class="token punctuation">,</span>
+  <span class="token property">"revokeRevealValue"</span><span class="token operator">:</span> <span class="token string">"+8jt3fqyfuQyPZh8LaiwTIh3+XFgFpfj"</span><span class="token punctuation">,</span>
+  <span class="token property">"revocation"</span><span class="token operator">:</span> <span class="token string">"BGYwtqc3ouUrgjQ7nzouZFcUrfXMwMWDwjyduo41Qr4fcoigptJ4xCRJSezMc2yMapY4QygTGHPvptY5cWFMfubYGuSm3wrabYfaN4PdMpsFNsEdB6ccz74JeSczuCewhqYdbRszjxKyXa75ek3Rv8SvDbysRVnUXSjg53VWRdb5ptxaA8Z4DMTQP8EWkD9ohAk7d9SJucxp8KJRssoxxfFjZKVLK652LsBtsH2HU6jEPezd9jbuTXCX1Lz92ZFMKezeGEb4RG482tGyG331DMYw9bYN98tZd3BfhdAMFGhM88LBrZxne6E4rLNnKCQ83hH1fgbs3hhgMsk99TgYLWZftZ4syCBWPKp1jGRKs5NbyxiC417j5fTyFCraMbiEe6ZSLBcJ5Zvb5xZMq2uuXbLtk3dRKUUyZv2vRszAYAueSqvErSN4UCBLaDrF2Qb3AEEWbccJR8B7UG2wdGXTbPyRSbdzLCKUsctyUkpxtrSMVMcdAdgXAV5sywPjmu7DL8qHGKZQcF2euMWSriYuU3ugNDRiohnb7zbU5kk4HF4Y9v3AZEDnQME5VJ643PJs9PdkwhyoGqDJmcNxY5GyCFf38z1nuH9uAx84h52wKVCdNaUX9tXE4Yge7tAtmo1CehGnsQ8FM3CabE2xZCX7qMREbBDuydMVmrhga3xHPbw8h6NwXmU7xivnQNoVYvucr1W8gJDnogFfrqS1RARBpcRW7L1b7QCBgFHhpMLRw16jfLVoCQc9eGx7JvkPd4KA7hN2SZnzDBuFoBCKEMRHhjgWa1HxVPUrHXmKCoLPosYnKnwCawvbf39EXJ4BTcehFGSSMHSzFkLjCBf1VrJguKLRJD1Lp9k9S9xyYFRaDuUZhGwtxM5gdsKdnbheFHEAa4T9z4xxy4yj6gjc6TWWevpKAUDNCCNneV7V5DEBvi8jB5ErFeDcCak7whuPrRkX1njncJgkhqcjfEc4pHdga7WXYfWJALRpZX1nzQ3LWJ8zJFpuuaXNBsZH5gGokL6sYKH5B3KNBBpcxfWSprD6AgodZ2fR5Hwkt976cwrfvizv2o5ctBfK1XX59X"</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</div>
+</section>
+</tab-panels>
+<h3 id="json-schema"><a class="toc-anchor" href="#json-schema">§</a> JSON Schema</h3>
+<div id="revocation-json-schema" class="notice example"><a class="notice-link" href="#revocation-json-schema">EXAMPLE</a><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"$schema"</span><span class="token operator">:</span> <span class="token string">"http://json-schema.org/draft-07/schema#"</span><span class="token punctuation">,</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+  <span class="token property">"oneOf"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"revokeRevealValue"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"proof"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+          <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token property">"type"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"proofPurpose"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"verificationMethod"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"created"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+              <span class="token property">"format"</span><span class="token operator">:</span> <span class="token string">"date-time"</span>
+            <span class="token punctuation">}</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token string">"type"</span><span class="token punctuation">,</span>
+            <span class="token string">"proofPurpose"</span><span class="token punctuation">,</span>
+            <span class="token string">"verificationMethod"</span><span class="token punctuation">,</span>
+            <span class="token string">"created"</span>
+          <span class="token punctuation">]</span><span class="token punctuation">,</span>
+          <span class="token property">"additionalProperties"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"revocation"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+          <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token property">"id"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"issuerId"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"credentialId"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"revoked"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+              <span class="token property">"format"</span><span class="token operator">:</span> <span class="token string">"date-time"</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"reasonCode"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"integer"</span> <span class="token punctuation">}</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token string">"id"</span><span class="token punctuation">,</span>
+            <span class="token string">"issuerId"</span><span class="token punctuation">,</span>
+            <span class="token string">"credentialId"</span><span class="token punctuation">,</span>
+            <span class="token string">"revoked"</span>
+          <span class="token punctuation">]</span><span class="token punctuation">,</span>
+          <span class="token property">"additionalProperties"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"id"</span><span class="token punctuation">,</span>
+        <span class="token string">"type"</span><span class="token punctuation">,</span>
+        <span class="token string">"version"</span><span class="token punctuation">,</span>
+        <span class="token string">"proof"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"additionalProperties"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"id"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"type"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"version"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token property">"revocation"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+          <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token property">"id"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"issuerId"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"credentialId"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"revoked"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+              <span class="token property">"format"</span><span class="token operator">:</span> <span class="token string">"date-time"</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"reasonCode"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"integer"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token property">"proof"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"object"</span><span class="token punctuation">,</span>
+              <span class="token property">"properties"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                <span class="token property">"type"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token property">"proofPurpose"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token property">"verificationMethod"</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token property">"created"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+                  <span class="token property">"format"</span><span class="token operator">:</span> <span class="token string">"date-time"</span>
+                <span class="token punctuation">}</span>
+              <span class="token punctuation">}</span><span class="token punctuation">,</span>
+              <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token string">"type"</span><span class="token punctuation">,</span>
+                <span class="token string">"proofPurpose"</span><span class="token punctuation">,</span>
+                <span class="token string">"verificationMethod"</span><span class="token punctuation">,</span>
+                <span class="token string">"created"</span>
+              <span class="token punctuation">]</span><span class="token punctuation">,</span>
+              <span class="token property">"additionalProperties"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+            <span class="token punctuation">}</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token string">"id"</span><span class="token punctuation">,</span>
+            <span class="token string">"issuerId"</span><span class="token punctuation">,</span>
+            <span class="token string">"credentialId"</span><span class="token punctuation">,</span>
+            <span class="token string">"revoked"</span><span class="token punctuation">,</span>
+            <span class="token string">"proof"</span>
+          <span class="token punctuation">]</span><span class="token punctuation">,</span>
+          <span class="token property">"additionalProperties"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token property">"required"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token string">"id"</span><span class="token punctuation">,</span>
+        <span class="token string">"type"</span><span class="token punctuation">,</span>
+        <span class="token string">"version"</span>
+      <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"additionalProperties"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+</div>
+<h2 id="storage-resolvability"><a class="toc-anchor" href="#storage-resolvability">§</a> Storage &amp; Resolvability</h2>
+<p>According to the <a href="https://w3c.github.io/vc-data-model/">Verifiable Credentials Data Model</a> it is essential that Revocations use a <em>globally-distributed service for revocation</em> and the <em>APIs…do not depend on submitting the ID of the credential</em>.</p>
+<p>This specification does not make explicit recommendations for hosting, but instead outlines considerations &amp; concerns when evaluating different hosting models. We recommend that the revocation system be distributed, hosted, and in use by multiple parties.</p>
+<p>This requirement is a mitigation against both privacy erosion and censorship. If the revocation service is hosted by the issuer, then they are effectively able to see with whom the Holder shares their data. A neutral 3rd party platform can be contractually obligated to obfuscate this data so as to maintain the privacy of the Holder. With a single host you risk there being business incentives to selectively omit revocations for certain issuers, or leak other transaction data devaluing the trust in the resource. To have the strongest revocation infrastructure ensure that no one party can compromise its integrity.</p>
+<h3 id="mutability"><a class="toc-anchor" href="#mutability">§</a> Mutability</h3>
+<p>Storage may be mutable or immutable. If mutable one must be aware of the risks of a party other than an Issuer altering or obstructing a Revocation. At the same time, there is a benefit of being able to simplify un-revoking a Credential which may have been revoked in error.</p>
+<p>Immutable storage faces opposite concerns: an audit log is kept and the data is inherently tamper-proof. However, revocation’s issued by mistake are not straightforward to recover from and may require credential re-issuance.</p>
+<h3 id="risks-rewards"><a class="toc-anchor" href="#risks-rewards">§</a> Risks &amp; Rewards</h3>
+<p>The following table aims to outline the risks &amp; rewards of different storage mechanisms for this Revocation format. Combinations not listed have either not been considered or are bad ideas not worth mentioning.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Storage Type</th>
+<th style="text-align:left">Writes</th>
+<th style="text-align:left">Reads</th>
+<th style="text-align:left">Risks</th>
+<th style="text-align:left">Rewards</th>
+<th style="text-align:left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Database</td>
+<td style="text-align:left">Permissioned</td>
+<td style="text-align:left">Public</td>
+<td style="text-align:left">Loss of audit history; general mutability risk.</td>
+<td style="text-align:left">Lower implementation cost. Control over writes allows data integrity risk mitigation.</td>
+<td style="text-align:left">This scheme requires trusting the host.</td>
+</tr>
+<tr>
+<td style="text-align:left">Ledger</td>
+<td style="text-align:left">Public</td>
+<td style="text-align:left">Public</td>
+<td style="text-align:left">Identifier namespace can be claimed by a party other than the issuer, effectively censoring an issuer’s ability to revoke. This can be mitigated with different Identification schemes.</td>
+<td style="text-align:left">Complete transparency.</td>
+<td style="text-align:left">It is recommended that either the <code>revokeRevealValue</code> scheme is used or the revocations use an issuer-chosen random identifier. With a random identifier the revocatoins can be written to the ledger, but an external system is needed to provide the mapping between the credential and revocation IDs.</td>
+</tr>
+<tr>
+<td style="text-align:left">Ledger</td>
+<td style="text-align:left">Permissioned</td>
+<td style="text-align:left">Public</td>
+<td style="text-align:left">Perception of a “closed system.”</td>
+<td style="text-align:left">Control over writes allows data integrity risk mitigation. Benefits of immutability and decentralization. Easier to be controlled by many.</td>
+<td style="text-align:left">Open sourcing the chain-code can increase the trust of the host(s).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="appendix"><a class="toc-anchor" href="#appendix">§</a> Appendix</h2>
+<h3 id="references"><a class="toc-anchor" href="#references">§</a> References</h3>
+<ul>
+<li><a href="https://w3c.github.io/did-core/">DID Core</a></li>
+<li><a href="https://w3c.github.io/vc-data-model/">Verifiable Credentials Data Model</a></li>
+<li><a href="https://json-schema.org/">JSON Schema</a></li>
+<li><a href="https://semver.org/">Semantic Versioning</a></li>
+<li><a href="https://tools.ietf.org/html/rfc4634#section-4.1">SHA-256</a></li>
+<li><a href="https://tools.ietf.org/html/rfc4122">UUID-4</a></li>
+<li><a href="https://w3c-ccg.github.io/ld-proofs/">Linked Data Proofs</a></li>
+<li><a href="https://www.ietf.org/rfc/rfc2898.txt">PBKDF2</a></li>
+</ul>
+
+              </article>    
+
+            </main>
+
+            <slide-panels id="slidepanels">
+              <slide-panel id="repo_issues" options="right">
+                <header class="panel-header">
+                  <span>
+                    <svg icon><use xlink:href="#github"></use></svg>
+                    <span issue-count></span>
+                  </span>
+                  <span class="repo-issue-toggle" panel-toggle="repo_issues">✕</span>
+                </header>
+                <ul id="repo_issue_list"></ul>
+              </slide-panel>
+
+              <slide-panel id="toc">
+                <header class="panel-header">
+                  <span>Table of Contents</span>
+                  <span panel-toggle="toc">✕</span>
+                </header>
+                <div id="toc_list">
+                  <ul class="toc">
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#status-of-this-document">Status of This Document</a></li>
+<li><a href="#terminology">Terminology</a></li>
+<li><a href="#revocations">Revocations</a>
+<ul>
+<li><a href="#data-model">Data Model</a>
+<ul>
+<li><a href="#type">Type</a></li>
+<li><a href="#unencrypted-data">Unencrypted Data</a></li>
+<li><a href="#encrypted-data">Encrypted Data</a></li>
+</ul>
+</li>
+<li><a href="#implementation-considerations">Implementation Considerations</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#json-schema">JSON Schema</a></li>
+</ul>
+</li>
+<li><a href="#storage-resolvability">Storage &amp; Resolvability</a>
+<ul>
+<li><a href="#mutability">Mutability</a></li>
+<li><a href="#risks-rewards">Risks &amp; Rewards</a></li>
+</ul>
+</li>
+<li><a href="#appendix">Appendix</a>
+<ul>
+<li><a href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+                </div>
+              </slide-panel>
+              
+            </slide-panels>
+
+          </body>
+          <script>window.specConfig = {"title":"Revocation Specification","spec_directory":"./spec/","output_path":"./","logo":"https://avatars1.githubusercontent.com/u/64261652?s=200&v=4","logo_link":"https://credentials.workday.com/","source":{"host":"github","account":"workdaycredentials","repo":"specifications"},"destination":"./","rootResourcePrefix":"./","destinationResourcePrefix":"./"}</script>
+          <script src="./spec-up/compiled/body.js" data-manual></script>
+        </html>
+      

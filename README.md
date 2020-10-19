@@ -4,6 +4,9 @@
 
 Proposals of new or updated specifications for consideration by a standards body such as DIF, IMS, or W3C.
 
+- [Revocations](specifications/revocations)
+    + Presented at IIW 31 in October 2020
+
 _Check back soon_
 
 ### Internal Development
